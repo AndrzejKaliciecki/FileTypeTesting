@@ -1,0 +1,16 @@
+Approval Name,Originator,Current Step(s),Space,Page,Status,Progress,Expiration,Started,Modified
+Add loads of labels on success,Andrzej Kaliciecki,-,Andrzej Kaliciecki,Labels testing,APPROVED,Step: 1 / 1 100%,,23 May 2025 11:20:35,23 May 2025 11:20:38
+Add 1 label on success,Andrzej Kaliciecki,-,Andrzej Kaliciecki,Labels testing,APPROVED,Step: 1 / 1 100%,,23 May 2025 11:19:45,23 May 2025 11:19:47
+Add loads of labels on success,Andrzej Kaliciecki,-,Andrzej Kaliciecki,Labels testing,APPROVED,Step: 1 / 1 100%,,23 May 2025 11:18:58,23 May 2025 11:19:01
+Add loads of labels on success,Andrzej Kaliciecki,-,Andrzej Kaliciecki,Labels testing,APPROVED,Step: 1 / 1 100%,,23 May 2025 11:17:43,23 May 2025 11:17:59
+Approval - Require comments on everything,Andrzej Test 1,Andrzej Kaliciecki,Andrzej Test 1,testpage,IN PROGRESS,Step: 0 / 1 0%,,21 May 2025 15:39:14,21 May 2025 15:39:14
+Approval - Group - Require comments on everything,Andrzej Kaliciecki,jira-users-ak-test-1,Software Development,test page,IN PROGRESS,Step: 0 / 1 0%,,21 May 2025 15:32:45,21 May 2025 15:32:45
+other user,linevab,-,Andrzej Kaliciecki,lorem manual,APPROVED,Step: 1 / 1 100%,,14 May 2025 15:04:34,14 May 2025 16:29:22
+Consent (user),Andrzej Kaliciecki,Andrzej Kaliciecki,Andrzej Kaliciecki,lorem manual,IN PROGRESS,Step: 0 / 1 0%,,14 May 2025 15:10:54,14 May 2025 15:10:54
+External user approval,Andrzej Kaliciecki,koroj71091@bauscn.com,Andrzej Kaliciecki,lorem manual,IN PROGRESS,Step: 0 / 1 0%,,14 May 2025 15:09:35,14 May 2025 15:09:35
+other user,Andrzej Kaliciecki,-,Andrzej Kaliciecki,lorem manual,APPROVED,Step: 1 / 1 100%,,14 May 2025 15:03:34,14 May 2025 15:04:09
+Approval - Group - Require comments on everything,Andrzej Kaliciecki,-,Andrzej Kaliciecki,Lorem ipsum,APPROVED,Step: 1 / 1 100%,,14 May 2025 13:58:56,14 May 2025 14:59:04
+External user approval,Andrzej Kaliciecki,koroj71091@bauscn.com,Andrzej Kaliciecki,Lorem ipsum,IN PROGRESS,Step: 0 / 1 0%,,24 April 2025 13:10:48,24 April 2025 13:10:48
+Approval - Require comments on everything,Andrzej Kaliciecki,Andrzej Kaliciecki,Andrzej Kaliciecki,Lorem ipsum,IN PROGRESS,Step: 0 / 1 0%,,24 April 2025 13:06:44,24 April 2025 13:06:44
+External user approval,Andrzej Kaliciecki,-,Andrzej Kaliciecki,Copy of Getting started in Confluence from Jira,APPROVED,Step: 1 / 1 100%,,23 April 2025 15:51:45,24 April 2025 12:34:54
+test1,Andrzej Kaliciecki,Andrzej Kaliciecki,Andrzej Kaliciecki,Getting started in Confluence from Jira,IN PROGRESS,Step: 0 / 1 0%,,11 April 2025 12:24:37,11 April 2025 12:24:37
