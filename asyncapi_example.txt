@@ -1,0 +1,260 @@
+asyncapi: "3.0.0"
+
+info:
+  title: Smart Home IoT Platform
+  version: "1.0.0"
+  description: |
+    An event-driven API for managing smart home devices.
+    Supports real-time device telemetry, control commands, and alerts.
+  contact:
+    name: Smart Home Team
+    email: api@smarthome.example.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+defaultContentType: application/json
+
+servers:
+  production:
+    host: mqtt.smarthome.example.com:8883
+    protocol: mqtt
+    description: Production MQTT broker (TLS)
+    security:
+      - $ref: "#/components/securitySchemes/userPassword"
+  development:
+    host: localhost:1883
+    protocol: mqtt
+    description: Local development broker
+
+channels:
+  deviceTelemetry:
+    address: "home/{homeId}/device/{deviceId}/telemetry"
+    description: Channel for receiving real-time telemetry data from devices.
+    parameters:
+      homeId:
+        $ref: "#/components/parameters/homeId"
+      deviceId:
+        $ref: "#/components/parameters/deviceId"
+    messages:
+      telemetryEvent:
+        $ref: "#/components/messages/TelemetryEvent"
+
+  deviceCommand:
+    address: "home/{homeId}/device/{deviceId}/command"
+    description: Channel for sending control commands to devices.
+    parameters:
+      homeId:
+        $ref: "#/components/parameters/homeId"
+      deviceId:
+        $ref: "#/components/parameters/deviceId"
+    messages:
+      deviceCommand:
+        $ref: "#/components/messages/DeviceCommand"
+
+  deviceAlerts:
+    address: "home/{homeId}/alerts"
+    description: Channel for broadcasting device alerts to all subscribers.
+    parameters:
+      homeId:
+        $ref: "#/components/parameters/homeId"
+    messages:
+      alertEvent:
+        $ref: "#/components/messages/AlertEvent"
+
+operations:
+  receiveTelemetry:
+    action: receive
+    channel:
+      $ref: "#/channels/deviceTelemetry"
+    summary: Subscribe to device telemetry updates.
+    description: |
+      Clients subscribe to this operation to receive continuous sensor
+      readings such as temperature, humidity, or energy usage.
+    bindings:
+      mqtt:
+        qos: 1
+        retain: false
+
+  sendCommand:
+    action: send
+    channel:
+      $ref: "#/channels/deviceCommand"
+    summary: Send a command to a smart device.
+    description: |
+      Publish a command payload to control a device (e.g., turn on a light,
+      set thermostat temperature, lock a door).
+    bindings:
+      mqtt:
+        qos: 2
+        retain: false
+
+  receiveAlerts:
+    action: receive
+    channel:
+      $ref: "#/channels/deviceAlerts"
+    summary: Subscribe to home-wide alerts.
+    description: |
+      Clients subscribe to receive high-priority alerts such as
+      smoke detection, water leaks, or security breaches.
+    bindings:
+      mqtt:
+        qos: 2
+        retain: true
+
+components:
+  messages:
+    TelemetryEvent:
+      name: TelemetryEvent
+      title: Device Telemetry Event
+      summary: Real-time sensor data from a smart device.
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/TelemetryPayload"
+      examples:
+        - name: thermostatReading
+          summary: A thermostat reporting temperature and humidity.
+          payload:
+            deviceId: "thermo-living-001"
+            timestamp: "2026-04-14T10:30:00Z"
+            sensors:
+              temperature: 21.5
+              humidity: 55.2
+            batteryLevel: 87
+
+    DeviceCommand:
+      name: DeviceCommand
+      title: Device Control Command
+      summary: A command to control a smart device.
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/CommandPayload"
+      examples:
+        - name: turnOnLight
+          summary: Turn on a smart light bulb.
+          payload:
+            commandId: "cmd-00123"
+            action: "turn_on"
+            parameters:
+              brightness: 80
+              colorTemp: 4000
+            issuedAt: "2026-04-14T10:31:00Z"
+
+    AlertEvent:
+      name: AlertEvent
+      title: Home Alert Event
+      summary: A high-priority alert triggered by a device.
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/AlertPayload"
+      examples:
+        - name: smokeAlert
+          summary: Smoke detector triggered in the kitchen.
+          payload:
+            alertId: "alert-99887"
+            deviceId: "smoke-kitchen-002"
+            severity: "critical"
+            type: "smoke_detected"
+            message: "Smoke detected in kitchen. Immediate action required."
+            triggeredAt: "2026-04-14T10:45:00Z"
+
+  schemas:
+    TelemetryPayload:
+      type: object
+      required:
+        - deviceId
+        - timestamp
+        - sensors
+      properties:
+        deviceId:
+          type: string
+          description: Unique identifier of the reporting device.
+          example: "thermo-living-001"
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of the reading.
+        sensors:
+          type: object
+          description: Key-value map of sensor readings.
+          additionalProperties:
+            type: number
+          example:
+            temperature: 21.5
+            humidity: 55.2
+        batteryLevel:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Battery level percentage (if applicable).
+
+    CommandPayload:
+      type: object
+      required:
+        - commandId
+        - action
+        - issuedAt
+      properties:
+        commandId:
+          type: string
+          description: Unique identifier for this command.
+        action:
+          type: string
+          enum:
+            - turn_on
+            - turn_off
+            - set_value
+            - reboot
+          description: The action to perform on the device.
+        parameters:
+          type: object
+          description: Optional action-specific parameters.
+          additionalProperties: true
+        issuedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the command was issued.
+
+    AlertPayload:
+      type: object
+      required:
+        - alertId
+        - deviceId
+        - severity
+        - type
+        - triggeredAt
+      properties:
+        alertId:
+          type: string
+          description: Unique identifier for the alert.
+        deviceId:
+          type: string
+          description: The device that triggered the alert.
+        severity:
+          type: string
+          enum:
+            - info
+            - warning
+            - critical
+          description: Severity level of the alert.
+        type:
+          type: string
+          description: Category of the alert (e.g., smoke_detected, water_leak).
+        message:
+          type: string
+          description: Human-readable description of the alert.
+        triggeredAt:
+          type: string
+          format: date-time
+          description: Timestamp when the alert was triggered.
+
+  parameters:
+    homeId:
+      description: The unique identifier of the home.
+    deviceId:
+      description: The unique identifier of the device within the home.
+
+  securitySchemes:
+    userPassword:
+      type: userPassword
+      description: MQTT username and password authentication.
