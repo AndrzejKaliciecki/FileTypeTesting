@@ -1,0 +1,223 @@
+# Blog API — GraphQL Schema
+
+# ──────────────────────────────────────────────
+# Scalars
+# ──────────────────────────────────────────────
+
+scalar DateTime
+scalar URL
+
+# ──────────────────────────────────────────────
+# Enums
+# ──────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  EDITOR
+  READER
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum SortOrder {
+  ASC
+  DESC
+}
+
+# ──────────────────────────────────────────────
+# Types
+# ──────────────────────────────────────────────
+
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  displayName: String
+  avatarUrl: URL
+  role: Role!
+  bio: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  posts(status: PostStatus, limit: Int, offset: Int): [Post!]!
+  comments: [Comment!]!
+}
+
+type Post {
+  id: ID!
+  title: String!
+  slug: String!
+  body: String!
+  excerpt: String
+  status: PostStatus!
+  publishedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  author: User!
+  tags: [Tag!]!
+  comments(limit: Int, offset: Int): [Comment!]!
+  commentCount: Int!
+  viewCount: Int!
+}
+
+type Comment {
+  id: ID!
+  body: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  author: User!
+  post: Post!
+  parent: Comment
+  replies: [Comment!]!
+}
+
+type Tag {
+  id: ID!
+  name: String!
+  slug: String!
+  posts(limit: Int, offset: Int): [Post!]!
+  postCount: Int!
+}
+
+# Pagination wrapper
+type PostConnection {
+  edges: [PostEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type PostEdge {
+  node: Post!
+  cursor: String!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+# ──────────────────────────────────────────────
+# Inputs
+# ──────────────────────────────────────────────
+
+input CreatePostInput {
+  title: String!
+  body: String!
+  excerpt: String
+  status: PostStatus = DRAFT
+  tagIds: [ID!]
+}
+
+input UpdatePostInput {
+  title: String
+  body: String
+  excerpt: String
+  status: PostStatus
+  tagIds: [ID!]
+}
+
+input CreateCommentInput {
+  postId: ID!
+  body: String!
+  parentId: ID
+}
+
+input PostsFilterInput {
+  authorId: ID
+  status: PostStatus
+  tagIds: [ID!]
+  searchQuery: String
+  publishedAfter: DateTime
+  publishedBefore: DateTime
+}
+
+input PostsOrderInput {
+  field: PostSortField!
+  direction: SortOrder = DESC
+}
+
+enum PostSortField {
+  CREATED_AT
+  PUBLISHED_AT
+  VIEW_COUNT
+  COMMENT_COUNT
+  TITLE
+}
+
+# ──────────────────────────────────────────────
+# Query
+# ──────────────────────────────────────────────
+
+type Query {
+  # Users
+  me: User
+  user(id: ID!): User
+  users(limit: Int = 20, offset: Int = 0): [User!]!
+
+  # Posts
+  post(id: ID, slug: String): Post
+  posts(
+    filter: PostsFilterInput
+    order: PostsOrderInput
+    first: Int
+    after: String
+    last: Int
+    before: String
+  ): PostConnection!
+
+  # Tags
+  tag(id: ID, slug: String): Tag
+  tags: [Tag!]!
+
+  # Comments
+  comment(id: ID!): Comment
+}
+
+# ──────────────────────────────────────────────
+# Mutation
+# ──────────────────────────────────────────────
+
+type Mutation {
+  # Auth
+  register(username: String!, email: String!, password: String!): AuthPayload!
+  login(email: String!, password: String!): AuthPayload!
+  logout: Boolean!
+
+  # Posts
+  createPost(input: CreatePostInput!): Post!
+  updatePost(id: ID!, input: UpdatePostInput!): Post!
+  deletePost(id: ID!): Boolean!
+  publishPost(id: ID!): Post!
+
+  # Comments
+  createComment(input: CreateCommentInput!): Comment!
+  updateComment(id: ID!, body: String!): Comment!
+  deleteComment(id: ID!): Boolean!
+
+  # Tags
+  createTag(name: String!): Tag!
+  deleteTag(id: ID!): Boolean!
+}
+
+# ──────────────────────────────────────────────
+# Subscription
+# ──────────────────────────────────────────────
+
+type Subscription {
+  commentAdded(postId: ID!): Comment!
+  postPublished: Post!
+}
+
+# ──────────────────────────────────────────────
+# Auth payload (returned on login / register)
+# ──────────────────────────────────────────────
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
