@@ -6,5 +6,5 @@
 === Example code section
 [,ruby]
 ----
-puts 'Hello, World!'
+puts 'Hello, World!' afafgewaawesyg wa\m5w3am TEST TEST TEST TEST TEST TEST
 ----
